@@ -10,21 +10,18 @@ export function setInput(name: string, value: string): void {
 }
 
 interface CacheInput {
-    path: string;
-    key: string;
+    ghToken: string;
+    prefix: string;
     restoreKeys?: string[];
 }
 
 export function setInputs(input: CacheInput): void {
-    setInput(Inputs.Path, input.path);
-    setInput(Inputs.Key, input.key);
-    input.restoreKeys &&
-        setInput(Inputs.RestoreKeys, input.restoreKeys.join("\n"));
+    setInput(Inputs.GhToken, input.ghToken);
+    setInput(Inputs.Prefix, input.prefix);
 }
 
 export function clearInputs(): void {
-    delete process.env[getInputName(Inputs.Path)];
-    delete process.env[getInputName(Inputs.Key)];
-    delete process.env[getInputName(Inputs.RestoreKeys)];
+    delete process.env[getInputName(Inputs.GhToken)];
+    delete process.env[getInputName(Inputs.Prefix)];
     delete process.env[getInputName(Inputs.UploadChunkSize)];
 }
