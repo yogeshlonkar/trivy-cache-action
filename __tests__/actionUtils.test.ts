@@ -37,6 +37,11 @@ test("isGhes returns false when server url is github.com", () => {
     }
 });
 
+test("isGhes returns false when no server url", () => {
+    delete process.env["GITHUB_SERVER_URL"];
+    expect(actionUtils.isGhes()).toBe(false);
+});
+
 test("isExactKeyMatch with undefined cache key returns false", () => {
     const key = "linux-rust";
     const cacheKey = undefined;

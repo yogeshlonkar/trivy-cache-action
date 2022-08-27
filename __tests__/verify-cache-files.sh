@@ -1,13 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Validate args
-prefix="$1"
-if [ -z "$prefix" ]; then
-  echo "Must supply prefix argument"
-  exit 1
-fi
-
-path="$2"
+path="$1"
 if [ -z "$path" ]; then
   echo "Must specify path argument"
   exit 1
@@ -20,17 +14,15 @@ if [ -z "$GITHUB_RUN_ID" ]; then
 fi
 
 # Verify file exists
-file="$path/test-file.txt"
-echo "Checking for $file"
-if [ ! -e $file ]; then
-  echo "File does not exist"
-  exit 1
-fi
-
-# Verify file content
-content="$(cat $file)"
-echo "File content:\n$content"
-if [ -z "$(echo $content | grep --fixed-strings "$prefix $GITHUB_RUN_ID")" ]; then
-  echo "Unexpected file content"
-  exit 1
-fi
+files=(
+"$path/db/metadata.json"
+"$path/db/trivy.db"
+"$path/fanal/fanal.db"
+)
+for file in "${files[@]}"; do
+  echo "Checking for $file"
+  if [ ! -e $file ]; then
+    echo "File does not exist"
+    exit 1
+  fi
+done
