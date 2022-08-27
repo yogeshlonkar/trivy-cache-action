@@ -1,8 +1,8 @@
 {
-  "name": "cache",
-  "version": "3.0.9",
+  "name": "trivy-cache-action",
+  "version": "0.1.1",
   "private": true,
-  "description": "Cache dependencies and build outputs",
+  "description": "Cache .trivy directory using trivy db version sha",
   "main": "dist/restore/index.js",
   "scripts": {
     "build": "tsc && ncc build -o dist/restore src/restore.ts && ncc build -o dist/save src/save.ts",
@@ -13,19 +13,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/cache.git"
+    "url": "git+https://github.com/yogeshlonkar/trivy-cache-action.git"
   },
   "keywords": [
     "actions",
     "node",
+    "trivy",
+    "trivy-db",
     "cache"
   ],
-  "author": "GitHub",
+  "author": "yogeshlonkar",
   "license": "MIT",
   "dependencies": {
     "@actions/cache": "^3.0.4",
     "@actions/core": "^1.9.1",
     "@actions/exec": "^1.1.1",
+    "@actions/http-client": "^2.0.1",
     "@actions/io": "^1.1.2"
   },
   "devDependencies": {

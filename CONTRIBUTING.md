@@ -1,13 +1,13 @@
 ## Contributing
 
-[fork]: https://github.com/actions/cache/fork
-[pr]: https://github.com/actions/cache/compare
+[fork]: https://github.com/yogeshlonkar/trivy-cache-action/fork
+[pr]: https://github.com/yogeshlonkar/trivy-cache-action/compare
 [style]: https://github.com/styleguide/js
 [code-of-conduct]: CODE_OF_CONDUCT.md
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
-Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](LICENSE).
+Contributions to this project are released to the public under the [project's open source license](LICENSE).
 
 Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating in this project you agree to abide by its terms.
 
@@ -35,4 +35,3 @@ This repository uses a tool called [Licensed](https://github.com/github/licensed
 
 - [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
 - [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
-- [GitHub Help](https://help.github.com)

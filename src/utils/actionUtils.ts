@@ -4,9 +4,8 @@ import * as core from "@actions/core";
 import { Outputs, RefKey, State } from "../constants";
 
 export function isGhes(): boolean {
-    const ghUrl = new URL(
-        process.env["GITHUB_SERVER_URL"] || "https://github.com"
-    );
+    const url = process.env.GITHUB_SERVER_URL ?? "https://github.com";
+    const ghUrl = new URL(url);
     return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 

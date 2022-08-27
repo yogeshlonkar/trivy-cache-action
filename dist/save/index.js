@@ -4927,10 +4927,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefKey = exports.Events = exports.State = exports.Outputs = exports.Inputs = void 0;
 var Inputs;
 (function (Inputs) {
-    Inputs["Key"] = "key";
-    Inputs["Path"] = "path";
-    Inputs["RestoreKeys"] = "restore-keys";
     Inputs["UploadChunkSize"] = "upload-chunk-size";
+    Inputs["GhToken"] = "gh-token";
+    Inputs["Prefix"] = "prefix";
 })(Inputs = exports.Inputs || (exports.Inputs = {}));
 var Outputs;
 (function (Outputs) {
@@ -38387,7 +38386,9 @@ const cache = __importStar(__webpack_require__(692));
 const core = __importStar(__webpack_require__(470));
 const constants_1 = __webpack_require__(196);
 function isGhes() {
-    const ghUrl = new URL(process.env["GITHUB_SERVER_URL"] || "https://github.com");
+    var _a;
+    const url = (_a = process.env.GITHUB_SERVER_URL) !== null && _a !== void 0 ? _a : "https://github.com";
+    const ghUrl = new URL(url);
     return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 exports.isGhes = isGhes;
@@ -41527,7 +41528,96 @@ exports.default = _default;
 /* 529 */,
 /* 530 */,
 /* 531 */,
-/* 532 */,
+/* 532 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.fixPermissions = exports.getLatestSHA256 = void 0;
+const core = __importStar(__webpack_require__(470));
+const http_client_1 = __webpack_require__(425);
+const child_process_1 = __webpack_require__(129);
+const util_1 = __importDefault(__webpack_require__(669));
+function getLatestSHA256(ghToken) {
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup("Fetch trivy DB SHA");
+        const additionalHeaders = {
+            [http_client_1.Headers.Accept]: "application/vnd.github+json",
+            Authorization: `token ${ghToken}`
+        };
+        // const proxy = process.env["https_proxy"] || process.env["HTTPS_PROXY"];
+        const _http = new http_client_1.HttpClient(process.env.GITHUB_ACTION_REPOSITORY);
+        const { statusCode: status, result: versions } = yield _http.getJson("https://api.github.com/orgs/aquasecurity/packages/container/trivy-db/versions", additionalHeaders);
+        if (status !== 200) {
+            throw new Error(`unexpected status from api.github.com: ${status}`);
+        }
+        core.info(`found ${(_a = versions === null || versions === void 0 ? void 0 : versions.length) !== null && _a !== void 0 ? _a : 0} db versions`);
+        const sha = (_b = versions === null || versions === void 0 ? void 0 : versions.find(version => version.metadata.container.tags.includes("latest"))) === null || _b === void 0 ? void 0 : _b.name.replaceAll("sha256:", "");
+        if (!sha) {
+            throw new Error(`could not find latest trivy db sha`);
+        }
+        core.info(`latest sha ${sha}`);
+        core.endGroup();
+        return sha;
+    });
+}
+exports.getLatestSHA256 = getLatestSHA256;
+function fixPermissions() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const exec = util_1.default.promisify(child_process_1.exec);
+        let cmd = "chown -R $(stat . -c %u:%g) .trivy";
+        try {
+            yield exec(`sh -c "type sudo 2>&1 >/dev/null"`);
+            cmd = "sudo " + cmd;
+        }
+        catch (error) {
+            core.info(`sudo not found probably running in container`);
+        }
+        core.info(`running ${cmd}`);
+        yield exec(cmd);
+    });
+}
+exports.fixPermissions = fixPermissions;
+
+
+/***/ }),
 /* 533 */,
 /* 534 */,
 /* 535 */,
@@ -47268,6 +47358,7 @@ const cache = __importStar(__webpack_require__(692));
 const core = __importStar(__webpack_require__(470));
 const constants_1 = __webpack_require__(196);
 const utils = __importStar(__webpack_require__(443));
+const trivyDBUtils_1 = __webpack_require__(532);
 // Catch and log any unhandled exceptions.  These exceptions can leak out of the uploadChunk method in
 // @actions/toolkit when a failed upload closes the file descriptor causing any in-process reads to
 // throw an uncaught exception.  Instead of failing this action, just warn.
@@ -47293,9 +47384,8 @@ function run() {
                 core.info(`Cache hit occurred on the primary key ${primaryKey}, not saving cache.`);
                 return;
             }
-            const cachePaths = utils.getInputAsArray(constants_1.Inputs.Path, {
-                required: true
-            });
+            const cachePaths = [".trivy"];
+            yield (0, trivyDBUtils_1.fixPermissions)();
             const cacheId = yield cache.saveCache(cachePaths, primaryKey, {
                 uploadChunkSize: utils.getInputAsInt(constants_1.Inputs.UploadChunkSize)
             });
