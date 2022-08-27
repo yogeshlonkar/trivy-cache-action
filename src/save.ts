@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 
 import { Events, Inputs, State } from "./constants";
 import * as utils from "./utils/actionUtils";
+import { fixPermissions } from "./utils/trivyDBUtils";
 
 // Catch and log any unhandled exceptions.  These exceptions can leak out of the uploadChunk method in
 // @actions/toolkit when a failed upload closes the file descriptor causing any in-process reads to
@@ -40,10 +41,8 @@ async function run(): Promise<void> {
             return;
         }
 
-        const cachePaths = utils.getInputAsArray(Inputs.Path, {
-            required: true
-        });
-
+        const cachePaths = [".trivy"];
+        await fixPermissions();
         const cacheId = await cache.saveCache(cachePaths, primaryKey, {
             uploadChunkSize: utils.getInputAsInt(Inputs.UploadChunkSize)
         });

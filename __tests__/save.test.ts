@@ -5,6 +5,7 @@ import { Events, Inputs, RefKey } from "../src/constants";
 import run from "../src/save";
 import * as actionUtils from "../src/utils/actionUtils";
 import * as testUtils from "../src/utils/testUtils";
+import * as trivyDBUtils from "../src/utils/trivyDBUtils";
 
 jest.mock("@actions/core");
 jest.mock("@actions/cache");
@@ -47,6 +48,8 @@ beforeAll(() => {
         const actualUtils = jest.requireActual("../src/utils/actionUtils");
         return actualUtils.isValidEvent();
     });
+
+    jest.spyOn(trivyDBUtils, "fixPermissions").mockImplementation(jest.fn());
 });
 
 beforeEach(() => {
@@ -82,7 +85,7 @@ test("save with no primary key in state outputs warning", async () => {
     const logWarningMock = jest.spyOn(actionUtils, "logWarning");
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const savedCacheKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
+    const savedCacheKey = "Linux-trivy-db-58d5b0952da3bb83f";
     jest.spyOn(core, "getState")
         // Cache Entry State
         .mockImplementationOnce(() => {
@@ -133,8 +136,8 @@ test("save on GHES with AC available", async () => {
     jest.spyOn(actionUtils, "isGhes").mockImplementation(() => true);
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
+    const primaryKey = "Linux-trivy-db-58d5b0952da3bb83f";
+    const savedCacheKey = "Linux-trivy-db-";
 
     jest.spyOn(core, "getState")
         // Cache Entry State
@@ -146,8 +149,8 @@ test("save on GHES with AC available", async () => {
             return primaryKey;
         });
 
-    const inputPath = "node_modules";
-    testUtils.setInput(Inputs.Path, inputPath);
+    const inputPath = ".trivy";
+    // testUtils.setInput(Inputs.Path, inputPath);
     testUtils.setInput(Inputs.UploadChunkSize, "4000000");
 
     const cacheId = 4;
@@ -171,7 +174,7 @@ test("save with exact match returns early", async () => {
     const infoMock = jest.spyOn(core, "info");
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
+    const primaryKey = "Linux-trivy-db-58d5b0952da3bb83f";
     const savedCacheKey = primaryKey;
 
     jest.spyOn(core, "getState")
@@ -194,40 +197,12 @@ test("save with exact match returns early", async () => {
     expect(failedMock).toHaveBeenCalledTimes(0);
 });
 
-test("save with missing input outputs warning", async () => {
-    const logWarningMock = jest.spyOn(actionUtils, "logWarning");
-    const failedMock = jest.spyOn(core, "setFailed");
-
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
-
-    jest.spyOn(core, "getState")
-        // Cache Entry State
-        .mockImplementationOnce(() => {
-            return savedCacheKey;
-        })
-        // Cache Key State
-        .mockImplementationOnce(() => {
-            return primaryKey;
-        });
-    const saveCacheMock = jest.spyOn(cache, "saveCache");
-
-    await run();
-
-    expect(saveCacheMock).toHaveBeenCalledTimes(0);
-    expect(logWarningMock).toHaveBeenCalledWith(
-        "Input required and not supplied: path"
-    );
-    expect(logWarningMock).toHaveBeenCalledTimes(1);
-    expect(failedMock).toHaveBeenCalledTimes(0);
-});
-
 test("save with large cache outputs warning", async () => {
     const logWarningMock = jest.spyOn(actionUtils, "logWarning");
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
+    const primaryKey = "Linux-trivy-db-bb828da54c148048dd17899b";
+    const savedCacheKey = "Linux-trivy-db-";
 
     jest.spyOn(core, "getState")
         // Cache Entry State
@@ -239,8 +214,8 @@ test("save with large cache outputs warning", async () => {
             return primaryKey;
         });
 
-    const inputPath = "node_modules";
-    testUtils.setInput(Inputs.Path, inputPath);
+    // const inputPath = ".trivy";
+    // testUtils.setInput(Inputs.Path, inputPath);
 
     const saveCacheMock = jest
         .spyOn(cache, "saveCache")
@@ -254,7 +229,7 @@ test("save with large cache outputs warning", async () => {
 
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
     expect(saveCacheMock).toHaveBeenCalledWith(
-        [inputPath],
+        [".trivy"],
         primaryKey,
         expect.anything()
     );
@@ -270,8 +245,8 @@ test("save with reserve cache failure outputs warning", async () => {
     const logWarningMock = jest.spyOn(actionUtils, "logWarning");
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
+    const primaryKey = "Linux-trivy-db-bb828da54c148048dd17899b";
+    const savedCacheKey = "Linux-trivy-db-";
 
     jest.spyOn(core, "getState")
         // Cache Entry State
@@ -283,8 +258,8 @@ test("save with reserve cache failure outputs warning", async () => {
             return primaryKey;
         });
 
-    const inputPath = "node_modules";
-    testUtils.setInput(Inputs.Path, inputPath);
+    // const inputPath = ".trivy";
+    // testUtils.setInput(Inputs.Path, inputPath);
 
     const saveCacheMock = jest
         .spyOn(cache, "saveCache")
@@ -300,7 +275,7 @@ test("save with reserve cache failure outputs warning", async () => {
 
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
     expect(saveCacheMock).toHaveBeenCalledWith(
-        [inputPath],
+        [".trivy"],
         primaryKey,
         expect.anything()
     );
@@ -316,8 +291,8 @@ test("save with server error outputs warning", async () => {
     const logWarningMock = jest.spyOn(actionUtils, "logWarning");
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
+    const primaryKey = "Linux-trivy-db-58d5b0952da3bb83f";
+    const savedCacheKey = "Linux-trivy-db-";
 
     jest.spyOn(core, "getState")
         // Cache Entry State
@@ -329,8 +304,8 @@ test("save with server error outputs warning", async () => {
             return primaryKey;
         });
 
-    const inputPath = "node_modules";
-    testUtils.setInput(Inputs.Path, inputPath);
+    // const inputPath = ".trivy";
+    // testUtils.setInput(Inputs.Path, inputPath);
 
     const saveCacheMock = jest
         .spyOn(cache, "saveCache")
@@ -342,7 +317,7 @@ test("save with server error outputs warning", async () => {
 
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
     expect(saveCacheMock).toHaveBeenCalledWith(
-        [inputPath],
+        [".trivy"],
         primaryKey,
         expect.anything()
     );
@@ -356,8 +331,8 @@ test("save with server error outputs warning", async () => {
 test("save with valid inputs uploads a cache", async () => {
     const failedMock = jest.spyOn(core, "setFailed");
 
-    const primaryKey = "Linux-node-bb828da54c148048dd17899ba9fda624811cfb43";
-    const savedCacheKey = "Linux-node-";
+    const primaryKey = "Linux-trivy-db-58d5b0952da3bb83f";
+    const savedCacheKey = "Linux-trivy-db-";
 
     jest.spyOn(core, "getState")
         // Cache Entry State
@@ -369,8 +344,6 @@ test("save with valid inputs uploads a cache", async () => {
             return primaryKey;
         });
 
-    const inputPath = "node_modules";
-    testUtils.setInput(Inputs.Path, inputPath);
     testUtils.setInput(Inputs.UploadChunkSize, "4000000");
 
     const cacheId = 4;
@@ -383,9 +356,16 @@ test("save with valid inputs uploads a cache", async () => {
     await run();
 
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
-    expect(saveCacheMock).toHaveBeenCalledWith([inputPath], primaryKey, {
+    expect(saveCacheMock).toHaveBeenCalledWith([".trivy"], primaryKey, {
         uploadChunkSize: 4000000
     });
 
     expect(failedMock).toHaveBeenCalledTimes(0);
+});
+
+test("check uncaughtException", async () => {
+    const msg = "some uncaught exception";
+    process.emit("uncaughtException", new Error(msg));
+    const logWarningMock = jest.spyOn(actionUtils, "logWarning");
+    expect(logWarningMock).toHaveBeenCalledWith(msg);
 });

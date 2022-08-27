@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 
 import { Events, Inputs, State } from "./constants";
 import * as utils from "./utils/actionUtils";
+import { getLatestSHA256 } from "./utils/trivyDBUtils";
 
 async function run(): Promise<void> {
     try {
@@ -21,13 +22,17 @@ async function run(): Promise<void> {
             return;
         }
 
-        const primaryKey = core.getInput(Inputs.Key, { required: true });
+        let prefix = core.getInput(Inputs.Prefix);
+        if (prefix !== "") {
+            prefix += "-";
+        }
+        const ghToken = core.getInput(Inputs.GhToken);
+        const sha = await getLatestSHA256(ghToken);
+        const primaryKey = `${prefix}trivy-db-${sha}`;
         core.saveState(State.CachePrimaryKey, primaryKey);
 
-        const restoreKeys = utils.getInputAsArray(Inputs.RestoreKeys);
-        const cachePaths = utils.getInputAsArray(Inputs.Path, {
-            required: true
-        });
+        const restoreKeys = [];
+        const cachePaths = [".trivy"];
 
         const cacheKey = await cache.restoreCache(
             cachePaths,
