@@ -49054,10 +49054,13 @@ function run() {
                 return;
             }
             let prefix = core.getInput(constants_1.Inputs.Prefix);
-            if (prefix !== "") {
+            if (prefix) {
                 prefix += "-";
             }
-            const ghToken = core.getInput(constants_1.Inputs.GhToken);
+            else {
+                prefix = "";
+            }
+            const ghToken = core.getInput(constants_1.Inputs.GhToken, { required: true });
             const sha = yield (0, trivyDBUtils_1.getLatestSHA256)(ghToken);
             const primaryKey = `${prefix}trivy-db-${sha}`;
             core.saveState(constants_1.State.CachePrimaryKey, primaryKey);

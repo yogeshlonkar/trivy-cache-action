@@ -4,7 +4,7 @@ author: 'yogeshlonkar'
 inputs:
   prefix:
     description: Prefix for cache key in case multiple workflows pushing cache in  parallel
-    required: true
+    required: false
   gh-token:
     description: GitHub token to fetching trivy db version to determine cache key
     required: true
