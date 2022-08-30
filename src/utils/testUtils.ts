@@ -11,13 +11,15 @@ export function setInput(name: string, value: string): void {
 
 interface CacheInput {
     ghToken: string;
-    prefix: string;
+    prefix?: string;
     restoreKeys?: string[];
 }
 
 export function setInputs(input: CacheInput): void {
     setInput(Inputs.GhToken, input.ghToken);
-    setInput(Inputs.Prefix, input.prefix);
+    if (input.prefix) {
+        setInput(Inputs.Prefix, input.prefix);
+    }
 }
 
 export function clearInputs(): void {

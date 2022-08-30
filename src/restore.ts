@@ -23,10 +23,12 @@ async function run(): Promise<void> {
         }
 
         let prefix = core.getInput(Inputs.Prefix);
-        if (prefix !== "") {
+        if (prefix) {
             prefix += "-";
+        } else {
+            prefix = "";
         }
-        const ghToken = core.getInput(Inputs.GhToken);
+        const ghToken = core.getInput(Inputs.GhToken, { required: true });
         const sha = await getLatestSHA256(ghToken);
         const primaryKey = `${prefix}trivy-db-${sha}`;
         core.saveState(State.CachePrimaryKey, primaryKey);

@@ -23,7 +23,7 @@ If you are using this inside a container, a POSIX-compliant `tar` needs to be in
 
 ### Inputs
 
-* `gh-token`: `REQUIRED` GitHub token to fetching trivy db version to determine cache key, e.g. `gh-token: ${{ secrets.GITHUB_TOKEN }}` this secret is available by default
+* `gh-token`: `REQUIRED` GitHub token for fetching trivy db version to determine cache key, e.g. `gh-token: ${{ secrets.GITHUB_TOKEN }}`
 * `prefix`: Prefix for cache key in case multiple workflows concurrently push cache, e.g. `prefix: workflow1`
 
 #### Environment Variables
@@ -51,9 +51,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      
+
     - name: Trivy Cache
       uses: yogeshlonkar/trivy-cache-action@v0
+      with:
+        gh-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Vulnerability scan
       uses: aquasecurity/trivy-action@master

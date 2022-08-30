@@ -53,6 +53,8 @@ afterEach(() => {
 });
 
 test("restore with invalid event outputs warning", async () => {
+    testUtils.setInputs({ ghToken: "abc" });
+
     const logWarningMock = jest.spyOn(actionUtils, "logWarning");
     const failedMock = jest.spyOn(core, "setFailed");
     const invalidEvent = "commit_comment";
@@ -66,6 +68,8 @@ test("restore with invalid event outputs warning", async () => {
 });
 
 test("restore without AC available should no-op", async () => {
+    testUtils.setInputs({ ghToken: "abc" });
+
     jest.spyOn(actionUtils, "isGhes").mockImplementation(() => false);
     jest.spyOn(actionUtils, "isCacheFeatureAvailable").mockImplementation(
         () => false
@@ -82,6 +86,8 @@ test("restore without AC available should no-op", async () => {
 });
 
 test("restore on GHES without AC available should no-op", async () => {
+    testUtils.setInputs({ ghToken: "abc" });
+
     jest.spyOn(actionUtils, "isGhes").mockImplementation(() => true);
     jest.spyOn(actionUtils, "isCacheFeatureAvailable").mockImplementation(
         () => false
@@ -101,6 +107,7 @@ test("restore on GHES with AC available ", async () => {
     jest.spyOn(actionUtils, "isGhes").mockImplementation(() => true);
     const path = ".trivy";
     const key = "trivy-db-sha1234";
+    testUtils.setInputs({ ghToken: "abc" });
 
     const infoMock = jest.spyOn(core, "info");
     const failedMock = jest.spyOn(core, "setFailed");
@@ -128,6 +135,7 @@ test("restore on GHES with AC available ", async () => {
 test("restore with no cache found", async () => {
     const path = ".trivy";
     const key = "trivy-db-sha1234";
+    testUtils.setInputs({ ghToken: "abc" });
 
     const infoMock = jest.spyOn(core, "info");
     const failedMock = jest.spyOn(core, "setFailed");
@@ -154,6 +162,7 @@ test("restore with no cache found", async () => {
 test("restore with restore keys and no cache found", async () => {
     const path = ".trivy";
     const key = "trivy-db-sha1234";
+    testUtils.setInputs({ ghToken: "abc" });
 
     const infoMock = jest.spyOn(core, "info");
     const failedMock = jest.spyOn(core, "setFailed");
@@ -180,6 +189,7 @@ test("restore with restore keys and no cache found", async () => {
 test("restore with cache found for key", async () => {
     const path = ".trivy";
     const key = "trivy-db-sha1234";
+    testUtils.setInputs({ ghToken: "abc" });
 
     const infoMock = jest.spyOn(core, "info");
     const failedMock = jest.spyOn(core, "setFailed");
