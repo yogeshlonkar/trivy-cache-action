@@ -24,6 +24,10 @@
   ],
   "author": "yogeshlonkar",
   "license": "MIT",
+  "engines" : { 
+    "npm" : ">=8.0.0 <9",
+    "node" : ">=16 <17"
+  },
   "dependencies": {
     "@actions/cache": "^3.0.4",
     "@actions/core": "^1.9.1",
