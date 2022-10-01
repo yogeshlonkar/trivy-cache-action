@@ -3,7 +3,7 @@ name: Licensed
 on:
   push:
     branches:
-      - '**'
+      - mainw
     paths-ignore:
       - '**.md'
       - 'docs/**'

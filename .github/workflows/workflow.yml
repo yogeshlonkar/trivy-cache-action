@@ -1,16 +1,13 @@
 name: Build & Tests
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-      - releases/**
     paths-ignore:
       - '**.md'
       - 'docs/**'
-  push:
-    branches:
-      - '**'
+  pull_request:
     paths-ignore:
       - '**.md'
       - 'docs/**'
