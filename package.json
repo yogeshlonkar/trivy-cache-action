@@ -1,6 +1,6 @@
 {
   "name": "trivy-cache-action",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Cache .trivy directory using trivy db version sha",
   "main": "dist/restore/index.js",
@@ -24,6 +24,10 @@
   ],
   "author": "yogeshlonkar",
   "license": "MIT",
+  "engines" : { 
+    "npm" : ">=8.0.0 <9",
+    "node" : ">=16 <17"
+  },
   "dependencies": {
     "@actions/cache": "^3.0.4",
     "@actions/core": "^1.9.1",
@@ -37,16 +41,16 @@
     "@types/node": "^16.11.33",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
-    "@zeit/ncc": "^0.20.5",
+    "@zeit/ncc": "^0.22.3",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^27.0.4",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
     "jest": "^28.0.3",
-    "jest-circus": "^27.5.1",
-    "nock": "^13.2.4",
+    "jest-circus": "^29.1.2",
+    "nock": "^13.2.9",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.2",
     "typescript": "^4.6.4"
