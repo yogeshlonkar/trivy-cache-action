@@ -5,11 +5,15 @@ on:
     branches:
       - main
       - releases/**
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   push:
     branches:
       - '**'
     paths-ignore:
       - '**.md'
+      - 'docs/**'
 
 jobs:
   build:
