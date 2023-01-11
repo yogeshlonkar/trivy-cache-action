@@ -37,7 +37,7 @@ jobs:
                   key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-node-
-            - run: npm ci
+            - run: npm ci --legacy-peer-deps
             - name: Prettier Format Check
               run: npm run format-check
             - name: ESLint Check
