@@ -1,138 +1,138 @@
 name: Build & Tests
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-  pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
+    push:
+        branches:
+            - main
+        paths-ignore:
+            - "**.md"
+            - "docs/**"
+    pull_request:
+        paths-ignore:
+            - "**.md"
+            - "docs/**"
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Setup Node.js 16.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16.x
-    - name: Determine npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - name: Restore npm cache
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-    - run: npm ci
-    - name: Prettier Format Check
-      run: npm run format-check
-    - name: ESLint Check
-      run: npm run lint
-    - name: Build & Test
-      run: npm run test
+    build:
+        strategy:
+            matrix:
+                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
+            fail-fast: false
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup Node.js 16.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16.x
+            - name: Determine npm cache directory
+              id: npm-cache
+              run: |
+                  echo "::set-output name=dir::$(npm config get cache)"
+            - name: Restore npm cache
+              uses: actions/cache@v3
+              with:
+                  path: ${{ steps.npm-cache.outputs.dir }}
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+            - run: npm ci
+            - name: Prettier Format Check
+              run: npm run format-check
+            - name: ESLint Check
+              run: npm run lint
+            - name: Build & Test
+              run: npm run test
 
-  # End to end save and restore
-  test-save:
-    strategy:
-      matrix:
-        os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Vulnerability scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        ignore-unfixed: true
-        cache-dir: .trivy
-    - name: Save cache
-      uses: ./
-      with:
-        gh-token: ${{ secrets.GITHUB_TOKEN }}
-        prefix: ${{ matrix.os }}
+    # End to end save and restore
+    test-save:
+        strategy:
+            matrix:
+                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
+            fail-fast: false
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Vulnerability scan
+              uses: aquasecurity/trivy-action@master
+              with:
+                  scan-type: "fs"
+                  ignore-unfixed: true
+                  cache-dir: .trivy
+            - name: Save cache
+              uses: ./
+              with:
+                  gh-token: ${{ secrets.GITHUB_TOKEN }}
+                  prefix: ${{ matrix.os }}
 
-  test-restore:
-    needs: test-save
-    strategy:
-      matrix:
-        os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Restore cache
-      uses: ./
-      with:
-        gh-token: ${{ secrets.GITHUB_TOKEN }}
-        prefix: ${{ matrix.os }}
-    - name: Verify cache files in working directory
-      shell: bash
-      run: __tests__/verify-cache-files.sh .trivy
+    test-restore:
+        needs: test-save
+        strategy:
+            matrix:
+                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
+            fail-fast: false
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Restore cache
+              uses: ./
+              with:
+                  gh-token: ${{ secrets.GITHUB_TOKEN }}
+                  prefix: ${{ matrix.os }}
+            - name: Verify cache files in working directory
+              shell: bash
+              run: __tests__/verify-cache-files.sh .trivy
 
-  # End to end with proxy
-  test-proxy-save:
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:latest
-      options: --dns 127.0.0.1
-    services:
-      squid-proxy:
-        image: datadog/squid:latest
-        ports:
-          - 3128:3128
-    env:
-      https_proxy: http://squid-proxy:3128
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Vulnerability scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        ignore-unfixed: true
-        cache-dir: .trivy
-    - name: Save cache
-      uses: ./
-      with:
-        gh-token: ${{ secrets.GITHUB_TOKEN }}
-        prefix: proxy
-  test-proxy-restore:
-    needs: test-proxy-save
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:latest
-      options: --dns 127.0.0.1
-    services:
-      squid-proxy:
-        image: datadog/squid:latest
-        ports:
-          - 3128:3128
-    env:
-      https_proxy: http://squid-proxy:3128
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Restore cache
-      uses: ./
-      with:
-        gh-token: ${{ secrets.GITHUB_TOKEN }}
-        prefix: proxy
-    - name: Verify cache
-      run: __tests__/verify-cache-files.sh .trivy
+    # End to end with proxy
+    test-proxy-save:
+        runs-on: ubuntu-latest
+        container:
+            image: ubuntu:latest
+            options: --dns 127.0.0.1
+        services:
+            squid-proxy:
+                image: ubuntu/squid:latest
+                ports:
+                    - 3128:3128
+        env:
+            https_proxy: http://squid-proxy:3128
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Vulnerability scan
+              uses: aquasecurity/trivy-action@master
+              with:
+                  scan-type: "fs"
+                  ignore-unfixed: true
+                  cache-dir: .trivy
+            - name: Save cache
+              uses: ./
+              with:
+                  gh-token: ${{ secrets.GITHUB_TOKEN }}
+                  prefix: proxy
+    test-proxy-restore:
+        needs: test-proxy-save
+        runs-on: ubuntu-latest
+        container:
+            image: ubuntu:latest
+            options: --dns 127.0.0.1
+        services:
+            squid-proxy:
+                image: ubuntu/squid:latest
+                ports:
+                    - 3128:3128
+        env:
+            https_proxy: http://squid-proxy:3128
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Restore cache
+              uses: ./
+              with:
+                  gh-token: ${{ secrets.GITHUB_TOKEN }}
+                  prefix: proxy
+            - name: Verify cache
+              run: __tests__/verify-cache-files.sh .trivy
