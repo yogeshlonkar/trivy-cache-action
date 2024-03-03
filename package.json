@@ -6,7 +6,7 @@
   "main": "dist/restore/index.js",
   "scripts": {
     "all": "npm run lint && npm run format && npm run test && npm run build",
-    "build": "tsc && ncc build -o dist/restore src/restore.ts && ncc build -o dist/save src/save.ts",
+    "build": "rm -rf dist && ncc build --source-map --license licenses.txt -o dist/restore src/restore.ts && ncc build --source-map --license licenses.txt -o dist/save src/save.ts",
     "test": "tsc --noEmit && jest --coverage",
     "lint": "eslint **/*.ts --cache --fix",
     "lint-check": "eslint **/*.ts --cache",
@@ -27,8 +27,7 @@
   "author": "yogeshlonkar",
   "license": "MIT",
   "engines": {
-    "npm": ">=8.0.0",
-    "node": ">=16 <17"
+    "node": "20"
   },
   "dependencies": {
     "@actions/cache": "^3.2.4",
@@ -43,7 +42,7 @@
     "@types/node": "^16.18.54",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.38.1",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
