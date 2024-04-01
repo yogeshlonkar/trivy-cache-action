@@ -40,8 +40,8 @@
     "@types/jest": "^29.5.12",
     "@types/nock": "^11.1.0",
     "@types/node": "^16.18.54",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
     "@vercel/ncc": "^0.38.1",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.1.0",
@@ -54,6 +54,6 @@
     "nock": "^13.5.4",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.3"
   }
 }
