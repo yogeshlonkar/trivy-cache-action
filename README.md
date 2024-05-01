@@ -83,7 +83,7 @@ This action is equivalent to running below steps with [`aquasecurity/trivy-actio
     jqFilter='.[] | select(.metadata.container.tags[] | contains("latest")) | .name | sub("sha256:";"")'
     sha=$(gh api -H "${headers}" "${endpoint}" | jq --raw-output "${jqFilter}")
     echo "Trivy DB sha256:${sha}"
-    echo "::set-output name=sha::${sha}"
+    echo "sha=${sha}" >> $GITHUB_OUTPUT
 - uses: actions/cache@v3
   with:
     path: .trivy
