@@ -21,7 +21,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Node.js 20.x
               uses: actions/setup-node@v4
               with:
@@ -54,7 +54,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Vulnerability scan
               uses: aquasecurity/trivy-action@master
               with:
@@ -76,7 +76,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Restore cache
               uses: ./
               with:
@@ -101,7 +101,7 @@ jobs:
             https_proxy: http://squid-proxy:3128
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Vulnerability scan
               uses: aquasecurity/trivy-action@master
               with:
@@ -128,7 +128,7 @@ jobs:
             https_proxy: http://squid-proxy:3128
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Restore cache
               uses: ./
               with:
