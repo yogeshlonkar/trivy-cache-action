@@ -81131,8 +81131,8 @@ const http_client_1 = __nccwpck_require__(6255);
 const child_process_1 = __nccwpck_require__(2081);
 const util_1 = __importDefault(__nccwpck_require__(3837));
 function getLatestSHA256(ghToken) {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
         core.startGroup("Fetch trivy DB SHA");
         const additionalHeaders = {
             [http_client_1.Headers.Accept]: "application/vnd.github+json",

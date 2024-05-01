@@ -8,8 +8,8 @@
     "all": "npm run lint && npm run format && npm run test && npm run build",
     "build": "rm -rf dist && ncc build --source-map --license licenses.txt -o dist/restore src/restore.ts && ncc build --source-map --license licenses.txt -o dist/save src/save.ts",
     "test": "tsc --noEmit && jest --coverage",
-    "lint": "eslint **/*.ts --cache --fix",
-    "lint-check": "eslint **/*.ts --cache",
+    "lint": "eslint **/*.ts --cache --fix --no-warn-ignored",
+    "lint-check": "eslint **/*.ts --cache --no-warn-ignored",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts"
   },
