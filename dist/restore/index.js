@@ -81208,7 +81208,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isCacheFeatureAvailable = exports.getInputAsInt = exports.getInputAsArray = exports.isValidEvent = exports.logWarning = exports.getCacheState = exports.setOutputAndState = exports.setCacheHitOutput = exports.setCacheState = exports.isExactKeyMatch = exports.isGhes = void 0;
+exports.isGhes = isGhes;
+exports.isExactKeyMatch = isExactKeyMatch;
+exports.setCacheState = setCacheState;
+exports.setCacheHitOutput = setCacheHitOutput;
+exports.setOutputAndState = setOutputAndState;
+exports.getCacheState = getCacheState;
+exports.logWarning = logWarning;
+exports.isValidEvent = isValidEvent;
+exports.getInputAsArray = getInputAsArray;
+exports.getInputAsInt = getInputAsInt;
+exports.isCacheFeatureAvailable = isCacheFeatureAvailable;
 const cache = __importStar(__nccwpck_require__(7799));
 const core = __importStar(__nccwpck_require__(2186));
 const constants_1 = __nccwpck_require__(9042);
@@ -81218,28 +81228,23 @@ function isGhes() {
     const ghUrl = new URL(url);
     return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
-exports.isGhes = isGhes;
 function isExactKeyMatch(key, cacheKey) {
     return !!(cacheKey &&
         cacheKey.localeCompare(key, undefined, {
             sensitivity: "accent"
         }) === 0);
 }
-exports.isExactKeyMatch = isExactKeyMatch;
 function setCacheState(state) {
     core.saveState(constants_1.State.CacheMatchedKey, state);
 }
-exports.setCacheState = setCacheState;
 function setCacheHitOutput(isCacheHit) {
     core.setOutput(constants_1.Outputs.CacheHit, isCacheHit.toString());
 }
-exports.setCacheHitOutput = setCacheHitOutput;
 function setOutputAndState(key, cacheKey) {
     setCacheHitOutput(isExactKeyMatch(key, cacheKey));
     // Store the matched cache key if it exists
     cacheKey && setCacheState(cacheKey);
 }
-exports.setOutputAndState = setOutputAndState;
 function getCacheState() {
     const cacheKey = core.getState(constants_1.State.CacheMatchedKey);
     if (cacheKey) {
@@ -81248,18 +81253,15 @@ function getCacheState() {
     }
     return undefined;
 }
-exports.getCacheState = getCacheState;
 function logWarning(message) {
     const warningPrefix = "[warning]";
     core.info(`${warningPrefix}${message}`);
 }
-exports.logWarning = logWarning;
 // Cache token authorized for all events that are tied to a ref
 // See GitHub Context https://help.github.com/actions/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#github-context
 function isValidEvent() {
     return constants_1.RefKey in process.env && Boolean(process.env[constants_1.RefKey]);
 }
-exports.isValidEvent = isValidEvent;
 function getInputAsArray(name, options) {
     return core
         .getInput(name, options)
@@ -81268,7 +81270,6 @@ function getInputAsArray(name, options) {
         .filter(x => x !== "")
         .sort();
 }
-exports.getInputAsArray = getInputAsArray;
 function getInputAsInt(name, options) {
     const value = parseInt(core.getInput(name, options));
     if (isNaN(value) || value < 0) {
@@ -81276,7 +81277,6 @@ function getInputAsInt(name, options) {
     }
     return value;
 }
-exports.getInputAsInt = getInputAsInt;
 function isCacheFeatureAvailable() {
     if (!cache.isFeatureAvailable()) {
         if (isGhes()) {
@@ -81290,7 +81290,6 @@ Otherwise please upgrade to GHES version >= 3.5 and If you are also using Github
     }
     return true;
 }
-exports.isCacheFeatureAvailable = isCacheFeatureAvailable;
 
 
 /***/ }),
@@ -81336,7 +81335,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fixPermissions = exports.getLatestSHA256 = void 0;
+exports.getLatestSHA256 = getLatestSHA256;
+exports.fixPermissions = fixPermissions;
 const core = __importStar(__nccwpck_require__(2186));
 const http_client_1 = __nccwpck_require__(6255);
 const child_process_1 = __nccwpck_require__(2081);
@@ -81365,7 +81365,6 @@ function getLatestSHA256(ghToken) {
         return sha;
     });
 }
-exports.getLatestSHA256 = getLatestSHA256;
 function fixPermissions() {
     return __awaiter(this, void 0, void 0, function* () {
         const exec = util_1.default.promisify(child_process_1.exec);
@@ -81381,7 +81380,6 @@ function fixPermissions() {
         yield exec(cmd);
     });
 }
-exports.fixPermissions = fixPermissions;
 
 
 /***/ }),
