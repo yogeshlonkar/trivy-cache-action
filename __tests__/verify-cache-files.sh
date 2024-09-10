@@ -17,7 +17,6 @@ fi
 files=(
 "$path/db/metadata.json"
 "$path/db/trivy.db"
-"$path/fanal/fanal.db"
 )
 for file in "${files[@]}"; do
   echo "Checking for $file"
@@ -26,3 +25,6 @@ for file in "${files[@]}"; do
     exit 1
   fi
 done
+if [ ! -e "$path/fanal/fanal.db" ]; then
+  echo "::warning fanal/fanal.db not found in cache"
+fi

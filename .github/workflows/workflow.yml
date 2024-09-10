@@ -61,6 +61,7 @@ jobs:
                   scan-type: "fs"
                   ignore-unfixed: true
                   cache-dir: .trivy
+            - run: ls -laR .trivy
             - name: Save cache
               uses: ./
               with:
@@ -82,6 +83,7 @@ jobs:
               with:
                   gh-token: ${{ secrets.GITHUB_TOKEN }}
                   prefix: ${{ matrix.os }}
+            - run: ls -laR .trivy
             - name: Verify cache files in working directory
               shell: bash
               run: __tests__/verify-cache-files.sh .trivy
@@ -108,11 +110,13 @@ jobs:
                   scan-type: "fs"
                   ignore-unfixed: true
                   cache-dir: .trivy
+            - run: ls -laR .trivy
             - name: Save cache
               uses: ./
               with:
                   gh-token: ${{ secrets.GITHUB_TOKEN }}
                   prefix: proxy
+
     test-proxy-restore:
         needs: test-proxy-save
         runs-on: ubuntu-latest
@@ -134,5 +138,6 @@ jobs:
               with:
                   gh-token: ${{ secrets.GITHUB_TOKEN }}
                   prefix: proxy
+            - run: ls -laR .trivy
             - name: Verify cache
               run: __tests__/verify-cache-files.sh .trivy
