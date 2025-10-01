@@ -70,8 +70,14 @@ test("fixPermissions runs sudo chown", async () => {
     });
     exec.mockReturnValueOnce("");
     await trivyDBUtils.fixPermissions();
-    expect(exec).nthCalledWith(1, `sh -c "type sudo 2>&1 >/dev/null"`);
-    expect(exec).nthCalledWith(2, "sudo chown -R $(stat . -c %u:%g) .trivy");
+    expect(exec).toHaveBeenNthCalledWith(
+        1,
+        `sh -c "type sudo 2>&1 >/dev/null"`
+    );
+    expect(exec).toHaveBeenNthCalledWith(
+        2,
+        "sudo chown -R $(stat . -c %u:%g) .trivy"
+    );
 });
 
 test("fixPermissions runs without sudo chown", async () => {
@@ -81,6 +87,12 @@ test("fixPermissions runs without sudo chown", async () => {
     });
     exec.mockRejectedValueOnce(new Error("exit 127"));
     await trivyDBUtils.fixPermissions();
-    expect(exec).nthCalledWith(1, `sh -c "type sudo 2>&1 >/dev/null"`);
-    expect(exec).nthCalledWith(2, "chown -R $(stat . -c %u:%g) .trivy");
+    expect(exec).toHaveBeenNthCalledWith(
+        1,
+        `sh -c "type sudo 2>&1 >/dev/null"`
+    );
+    expect(exec).toHaveBeenNthCalledWith(
+        2,
+        "chown -R $(stat . -c %u:%g) .trivy"
+    );
 });
