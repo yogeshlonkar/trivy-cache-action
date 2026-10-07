@@ -54,7 +54,7 @@ export async function fixPermissions(): Promise<void> {
     try {
         await exec(`sh -c "type sudo 2>&1 >/dev/null"`);
         cmd = "sudo " + cmd;
-    } catch (error: unknown) {
+    } catch {
         core.info(`sudo not found probably running in container`);
     }
     core.info(`running ${cmd}`);

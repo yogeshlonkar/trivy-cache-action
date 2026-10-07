@@ -103,7 +103,7 @@ test("restore on GHES without AC available should no-op", async () => {
     expect(setCacheHitOutputMock).toHaveBeenCalledWith(false);
 });
 
-test("restore on GHES with AC available ", async () => {
+test("restore on GHES with AC available", async () => {
     jest.spyOn(actionUtils, "isGhes").mockImplementation(() => true);
     const path = ".trivy";
     const key = "trivy-db-sha1234";

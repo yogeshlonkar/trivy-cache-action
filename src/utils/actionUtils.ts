@@ -29,7 +29,9 @@ export function setCacheHitOutput(isCacheHit: boolean): void {
 export function setOutputAndState(key: string, cacheKey?: string): void {
     setCacheHitOutput(isExactKeyMatch(key, cacheKey));
     // Store the matched cache key if it exists
-    cacheKey && setCacheState(cacheKey);
+    if (cacheKey) {
+        setCacheState(cacheKey);
+    }
 }
 
 export function getCacheState(): string | undefined {
