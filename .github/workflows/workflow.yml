@@ -1,79 +1,82 @@
 name: Build & Tests
 
 on:
-    push:
-        branches:
-            - main
-        paths-ignore:
-            - "**.md"
-            - "docs/**"
-    pull_request:
-        paths-ignore:
-            - "**.md"
-            - "docs/**"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+permissions:
+  contents: read
 
 jobs:
-    build:
-        strategy:
-            matrix:
-                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-            fail-fast: false
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Setup Node.js 20.x
-              uses: actions/setup-node@v5
-              with:
-                  node-version: 20.x
-                  cache: 'npm'
-            - run: npm ci --legacy-peer-deps
-            - name: Prettier Format Check
-              run: npm run format-check
-            - name: ESLint Check
-              run: npm run lint
-            - name: Build & Test
-              run: npm run test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set Node.js 24.x
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: 'npm'
+      - run: npm ci
+      - name: Prettier Format Check
+        run: npm run format-check
+      - name: ESLint Check
+        run: npm run lint-check
+      - name: Build & Test
+        run: npm test
 
-    # End to end save and restore
-    test-save:
-        strategy:
-            matrix:
-                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-            fail-fast: false
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Vulnerability scan
-              uses: aquasecurity/trivy-action@master
-              with:
-                  scan-type: "fs"
-                  ignore-unfixed: true
-                  cache-dir: .trivy
-            - run: ls -laR .trivy
-            - name: Save cache
-              uses: ./
-              with:
-                  gh-token: ${{ secrets.GITHUB_TOKEN }}
-                  prefix: ${{ matrix.os }}
+  # End to end save and restore
+  test-save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          cache-dir: .trivy
+      - run: ls -laR .trivy
+      - name: Save cache
+        uses: ./
+        with:
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: ubuntu-latest
 
-    test-restore:
-        needs: test-save
-        strategy:
-            matrix:
-                os: [ubuntu-latest] # not supported windows-latest, macOS-latest
-            fail-fast: false
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Restore cache
-              uses: ./
-              with:
-                  gh-token: ${{ secrets.GITHUB_TOKEN }}
-                  prefix: ${{ matrix.os }}
-            - run: ls -laR .trivy
-            - name: Verify cache files in working directory
-              shell: bash
-              run: __tests__/verify-cache-files.sh .trivy
+  test-restore:
+    needs: test-save
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Restore cache
+        uses: ./
+        with:
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: ubuntu-latest
+      - run: ls -laR .trivy
+      - name: Verify cache files in working directory
+        shell: bash
+        run: __tests__/verify-cache-files.sh .trivy
+
+  # The ruleset on main requires one check, `required`, rather than naming the
+  # jobs above. check-dist.yml and markdown.yml end in a job of the same name,
+  # so a Markdown-only pull request, which skips this workflow, still gets one,
+  # and GitHub requires every check named `required` on a commit to pass.
+  required:
+    needs: [build, test-save, test-restore]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for r in $RESULTS; do [ "$r" = success ] || exit 1; done

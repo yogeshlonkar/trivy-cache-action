@@ -1,0 +1,30 @@
+name: Push major tag
+
+# Moves the major tag (v0 for v0.1.18) to each release tag, since README.md
+# tells users to pin `@v0`. The ruleset on tags guards v*.*.* only, so the
+# major tag can still be force-pushed here.
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  tag-major:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check and create major tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Ignoring $TAG, not a vX.Y.Z release"
+            exit 0
+          fi
+          major="${TAG%%.*}"
+          echo "Pushing $major to $TAG"
+          git tag -f "$major"
+          git push -f origin "refs/tags/$major"
