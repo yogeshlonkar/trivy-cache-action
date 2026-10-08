@@ -6,8 +6,9 @@ inputs:
     description: Prefix for cache key in case multiple workflows pushing cache in  parallel
     required: false
   gh-token:
-    description: GitHub token to fetching trivy db version to determine cache key
-    required: true
+    description: No longer used, the trivy db version is read from ghcr.io. Kept so existing workflows don't fail.
+    required: false
+    deprecationMessage: gh-token is no longer used and can be removed.
   upload-chunk-size:
     description: 'The chunk size used to split up large files during upload, in bytes'
     required: false

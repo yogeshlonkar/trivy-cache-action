@@ -28,8 +28,12 @@ async function run(): Promise<void> {
         } else {
             prefix = "";
         }
-        const ghToken = core.getInput(Inputs.GhToken, { required: true });
-        const sha = await getLatestSHA256(ghToken);
+        if (core.getInput(Inputs.GhToken)) {
+            core.notice(
+                "gh-token is no longer used and can be removed, the trivy db sha is read from ghcr.io"
+            );
+        }
+        const sha = await getLatestSHA256();
         const primaryKey = `${prefix}trivy-db-${sha}`;
         core.saveState(State.CachePrimaryKey, primaryKey);
 
