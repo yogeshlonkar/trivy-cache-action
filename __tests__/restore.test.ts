@@ -250,9 +250,45 @@ test("fails the step if error is thrown", async () => {
     const prefix = "macos";
     testUtils.setInputs({ prefix, ghToken: "abc" });
     const failedMock = jest.spyOn(core, "setFailed");
-    jest.spyOn(trivyDBUtils, "getLatestSHA256").mockImplementation(() => {
+    jest.spyOn(trivyDBUtils, "getLatestSHA256").mockImplementationOnce(() => {
         throw new Error("some error fetching sha");
     });
     await run();
     expect(failedMock).toHaveBeenCalledTimes(1);
+});
+
+test("restore without gh-token", async () => {
+    const key = "trivy-db-sha1234";
+    testUtils.setInputs({});
+
+    const noticeMock = jest.spyOn(core, "notice");
+    const failedMock = jest.spyOn(core, "setFailed");
+    const restoreCacheMock = jest
+        .spyOn(cache, "restoreCache")
+        .mockImplementationOnce(() => {
+            return Promise.resolve(key);
+        });
+
+    await run();
+
+    expect(restoreCacheMock).toHaveBeenCalledWith([".trivy"], key, []);
+    expect(noticeMock).toHaveBeenCalledTimes(0);
+    expect(failedMock).toHaveBeenCalledTimes(0);
+});
+
+test("restore with gh-token notes it is no longer used", async () => {
+    testUtils.setInputs({ ghToken: "abc" });
+
+    const noticeMock = jest.spyOn(core, "notice");
+    const failedMock = jest.spyOn(core, "setFailed");
+    jest.spyOn(cache, "restoreCache").mockImplementationOnce(() => {
+        return Promise.resolve(undefined);
+    });
+
+    await run();
+
+    expect(noticeMock).toHaveBeenCalledWith(
+        "gh-token is no longer used and can be removed, the trivy db sha is read from ghcr.io"
+    );
+    expect(failedMock).toHaveBeenCalledTimes(0);
 });

@@ -48,7 +48,6 @@ jobs:
       - name: Save cache
         uses: ./
         with:
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
           prefix: ubuntu-latest
 
   test-restore:
@@ -59,7 +58,6 @@ jobs:
       - name: Restore cache
         uses: ./
         with:
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
           prefix: ubuntu-latest
       - run: ls -laR .trivy
       - name: Verify cache files in working directory

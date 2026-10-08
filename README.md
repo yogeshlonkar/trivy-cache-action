@@ -23,7 +23,7 @@ If you are using this inside a container, a POSIX-compliant `tar` needs to be in
 
 ### Inputs
 
-* `gh-token`: `REQUIRED` GitHub token for fetching trivy db version to determine cache key, e.g. `gh-token: ${{ secrets.GITHUB_TOKEN }}`
+* `gh-token`: No longer used and can be removed. The trivy db SHA256 is read from `ghcr.io` with an anonymous pull token. Setting it only logs a notice.
 * `prefix`: Prefix for cache key in case multiple workflows concurrently push cache, e.g. `prefix: workflow1`
 
 #### Environment Variables
@@ -54,9 +54,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Trivy Cache
-      uses: yogeshlonkar/trivy-cache-action@v0
-      with:
-        gh-token: ${{ secrets.GITHUB_TOKEN }}
+      uses: yogeshlonkar/trivy-cache-action@v1
 
     - name: Vulnerability scan
       uses: aquasecurity/trivy-action@master
@@ -76,13 +74,12 @@ This action is equivalent to running below steps with [`aquasecurity/trivy-actio
 ```yaml
 - id: trivy-db
   name: Check trivy db sha
-  env:
-    GH_TOKEN: ${{ github.token }}
   run: |
-    endpoint='/orgs/aquasecurity/packages/container/trivy-db/versions'
-    headers='Accept: application/vnd.github+json'
-    jqFilter='.[] | select(.metadata.container.tags[] | contains("latest")) | .name | sub("sha256:";"")'
-    sha=$(gh api -H "${headers}" "${endpoint}" | jq --raw-output "${jqFilter}")
+    token=$(curl -fsS 'https://ghcr.io/token?scope=repository:aquasecurity/trivy-db:pull' | jq -r .token)
+    accept='application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json'
+    sha=$(curl -fsSI -H "Authorization: Bearer ${token}" -H "Accept: ${accept}" \
+      https://ghcr.io/v2/aquasecurity/trivy-db/manifests/latest \
+      | tr -d '\r' | awk -F': ' 'tolower($1) == "docker-content-digest" { sub("sha256:", "", $2); print $2 }')
     echo "Trivy DB sha256:${sha}"
     echo "sha=${sha}" >> $GITHUB_OUTPUT
 - uses: actions/cache@v3
