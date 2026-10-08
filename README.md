@@ -27,6 +27,7 @@ If you are using this inside a container, a POSIX-compliant `tar` needs to be in
 * `prefix`: Prefix for cache key in case multiple workflows concurrently push cache, e.g. `prefix: workflow1`
 
 #### Environment Variables
+
 * `SEGMENT_DOWNLOAD_TIMEOUT_MIN` - Segment download timeout (in minutes, default `60`) to abort download of the segment if not completed in the defined number of minutes. [Read more](#cache-segment-restore-timeout)
 
 ### Outputs

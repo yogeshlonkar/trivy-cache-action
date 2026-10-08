@@ -19,10 +19,13 @@ on:
       - '**.md'
       - 'docs/**'
   workflow_dispatch:
+  # Every pull request, Markdown-only ones included. The ruleset on main
+  # requires code scanning results from CodeQL, and a pull request this
+  # workflow skipped has none, so it would sit blocked waiting for them.
+  # Pushes to main still skip Markdown.
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
+    branches:
+      - main
   schedule:
     - cron: '31 7 * * 3'
 
@@ -44,7 +47,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
