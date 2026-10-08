@@ -1,6 +1,6 @@
 {
   "name": "trivy-cache-action",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Cache .trivy directory using trivy db version sha",
   "main": "dist/restore/index.js",

@@ -54,7 +54,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Trivy Cache
-      uses: yogeshlonkar/trivy-cache-action@v0
+      uses: yogeshlonkar/trivy-cache-action@v1
 
     - name: Vulnerability scan
       uses: aquasecurity/trivy-action@master
